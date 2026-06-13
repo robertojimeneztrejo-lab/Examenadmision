@@ -6,6 +6,7 @@ from utils.supabase_client import obtener_dominio, obtener_dominio_general, obte
 from utils.helpers import procesar_actividad, DIAS_SEMANA_ES
 
 st.set_page_config(page_title="Dashboard - EXANI-II Prep", page_icon="📊", layout="wide")
+st.sidebar.image("assets/logo.jpg", width=100)
 
 if "usuario_id" not in st.session_state:
     st.warning("Inicia sesión desde la página principal.")
@@ -105,4 +106,3 @@ else:
         text_auto=".0f",
     )
     st.plotly_chart(fig3, use_container_width=True)
-
