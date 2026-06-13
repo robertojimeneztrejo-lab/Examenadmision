@@ -94,12 +94,14 @@ def generar_preguntas(materia: str, subtema: str, n: int = 10, dificultad: int =
         else:
             raise ValueError(f"No se pudo parsear la respuesta de Gemini:\n{texto}")
 
+    area_aplicable = ["1", "2", "3", "4"] if area == "TODAS" else [area]
+
     preguntas = []
     for p in data.get("preguntas", []):
         preguntas.append({
             "materia": materia,
             "subtema": subtema,
-            "area_aplicable": [area],
+            "area_aplicable": area_aplicable,
             "pregunta": p["pregunta"],
             "opcion_a": p["opcion_a"],
             "opcion_b": p["opcion_b"],
