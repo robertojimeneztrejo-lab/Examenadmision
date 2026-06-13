@@ -178,7 +178,11 @@ TEMARIO = {
 
 
 def materias_por_area(area: str):
-    """Devuelve lista de materias aplicables a un área dada."""
+    """Devuelve lista de materias aplicables a un área dada.
+    Si area == 'TODAS', devuelve todas las materias del temario.
+    """
+    if area == "TODAS":
+        return list(TEMARIO.keys())
     return [m for m, d in TEMARIO.items() if area in d["areas"]]
 
 
@@ -192,4 +196,5 @@ AREAS = {
     "2": "Ciencias Biológicas, Químicas y de la Salud",
     "3": "Ciencias Sociales y Administrativas",
     "4": "Humanidades y Artes",
+    "TODAS": "Todas las áreas (examen general)",
 }
