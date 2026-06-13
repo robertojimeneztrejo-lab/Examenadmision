@@ -5,30 +5,14 @@ from data.temario import AREAS
 
 st.set_page_config(page_title="EXANI-II Prep", page_icon="📚", layout="wide")
 
-# --- DIAGNÓSTICO TEMPORAL: borrar después de resolver el problema ---
-with st.expander("🔧 Diagnóstico (temporal)"):
-    st.write("SUPABASE_URL:", repr(st.secrets.get("SUPABASE_URL", "NO ENCONTRADO")))
-    st.write("SUPABASE_KEY (primeros 15 caracteres):", repr(st.secrets.get("SUPABASE_KEY", "NO ENCONTRADO"))[:20])
-
-    st.divider()
-    st.write("Prueba directa de validar_login:")
-    if st.button("Probar validar_login('roberto', 'Roberto13')"):
-        from utils.supabase_client import get_supabase_client
-        sb = get_supabase_client()
-        try:
-            res = sb.rpc("validar_login", {"p_username": "roberto", "p_password": "Roberto13"}).execute()
-            st.write("res.data:", res.data)
-            st.write("Tipo:", type(res.data))
-        except Exception as e:
-            st.write("EXCEPCIÓN:", repr(e))
-# --- FIN DIAGNÓSTICO ---
-
-
-
 
 def login_screen():
-    st.title("📚 EXANI-II Prep")
-    st.subheader("Inicia sesión para continuar")
+    col1, col2 = st.columns([1, 4])
+    with col1:
+        st.image("assets/logo.jpg", width=120)
+    with col2:
+        st.title("EXANI-II Prep")
+        st.subheader("Inicia sesión para continuar")
 
     with st.form("login_form"):
         username = st.text_input("Usuario")
@@ -58,7 +42,8 @@ def login_screen():
 
 
 def main_app():
-    st.sidebar.title("📚 EXANI-II Prep")
+    st.sidebar.image("assets/logo.jpg", width=100)
+    st.sidebar.title("EXANI-II Prep")
     st.sidebar.markdown(f"**Usuario:** {st.session_state['nombre']}")
 
     # Selector de área (puede cambiarse libremente durante la sesión)
