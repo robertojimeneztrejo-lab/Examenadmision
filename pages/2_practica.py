@@ -50,10 +50,27 @@ def iniciar_bloque(materia, subtema):
 
         if len(preguntas) < 10:
             faltan = 10 - len(preguntas)
-            nuevas = generar_preguntas(materia, subtema, n=max(faltan, 5), dificultad=1, area=area)
-            insertadas = insertar_preguntas(nuevas)
-            if insertadas:
-                preguntas.extend(insertadas)
+            try:
+                nuevas = generar_preguntas(materia, subtema, n=max(faltan, 5), dificultad=1, area=area)
+                insertadas = insertar_preguntas(nuevas)
+                if insertadas:
+                    preguntas.extend(insertadas)
+            except ValueError as e:
+                if len(preguntas) == 0:
+                    st.error(
+                        "No se pudieron generar preguntas para este tema en este momento "
+                        "(la IA no devolvió un formato válido). Intenta de nuevo en unos segundos "
+                        "o elige otro subtema."
+                    )
+                    with st.expander("Detalle técnico"):
+                        st.code(str(e))
+                    return False
+                # Si ya había suficientes preguntas en el banco, seguimos sin las nuevas
+                st.warning("No se pudieron generar preguntas adicionales, se usará el banco existente.")
+
+        if len(preguntas) == 0:
+            st.error("No hay preguntas disponibles para este tema todavía. Intenta otro subtema.")
+            return False
 
         seleccionadas = seleccionar_aleatorias(preguntas, 10)
 
@@ -68,6 +85,7 @@ def iniciar_bloque(materia, subtema):
         st.session_state["materia_actual"] = materia
         st.session_state["subtema_actual"] = subtema
         st.session_state["tiempo_inicio_bloque"] = time.time()
+        return True
 
 
 def reiniciar_estado():
@@ -93,8 +111,8 @@ if not st.session_state["bloque_activo"]:
         subtema = st.selectbox("Subtema", subtemas_de(materia))
 
     if st.button("Comenzar bloque de 10 preguntas", type="primary"):
-        iniciar_bloque(materia, subtema)
-        st.rerun()
+        if iniciar_bloque(materia, subtema):
+            st.rerun()
 
 # ---------------------------------------------------------
 # Mostrar bloque activo
@@ -186,8 +204,8 @@ elif st.session_state["bloque_terminado"]:
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Otro bloque de 10 preguntas (mismo tema)", type="primary"):
-            iniciar_bloque(materia, subtema)
-            st.rerun()
+            if iniciar_bloque(materia, subtema):
+                st.rerun()
     with col2:
         if st.button("Finalizar y elegir otro tema"):
             reiniciar_estado()
