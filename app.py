@@ -24,7 +24,7 @@ def login_screen():
         if usuario:
             st.session_state["usuario_id"] = usuario["id"]
             st.session_state["nombre"] = usuario["nombre"]
-            st.session_state["area"] = usuario["area"]
+            st.session_state["area"] = "TODAS"  # por defecto, el usuario elige luego en el sidebar
             st.success(f"¡Bienvenido, {usuario['nombre']}!")
             st.rerun()
         else:
@@ -40,7 +40,22 @@ def login_screen():
 def main_app():
     st.sidebar.title("📚 EXANI-II Prep")
     st.sidebar.markdown(f"**Usuario:** {st.session_state['nombre']}")
-    st.sidebar.markdown(f"**Área:** {st.session_state['area']} - {AREAS.get(st.session_state['area'], '')}")
+
+    # Selector de área (puede cambiarse libremente durante la sesión)
+    opciones_area = list(AREAS.keys())
+    area_actual = st.session_state.get("area", "TODAS")
+    if area_actual not in opciones_area:
+        area_actual = "TODAS"
+
+    nueva_area = st.sidebar.selectbox(
+        "Área a estudiar",
+        options=opciones_area,
+        index=opciones_area.index(area_actual),
+        format_func=lambda a: AREAS.get(a, a),
+        help="Puedes cambiar el área en cualquier momento. Elige 'Todas las áreas' "
+             "si tu examen incluye preguntas de varias áreas.",
+    )
+    st.session_state["area"] = nueva_area
 
     if st.sidebar.button("Cerrar sesión"):
         for key in ["usuario_id", "nombre", "area"]:
