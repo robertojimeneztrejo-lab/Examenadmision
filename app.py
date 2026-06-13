@@ -9,7 +9,20 @@ st.set_page_config(page_title="EXANI-II Prep", page_icon="📚", layout="wide")
 with st.expander("🔧 Diagnóstico (temporal)"):
     st.write("SUPABASE_URL:", repr(st.secrets.get("SUPABASE_URL", "NO ENCONTRADO")))
     st.write("SUPABASE_KEY (primeros 15 caracteres):", repr(st.secrets.get("SUPABASE_KEY", "NO ENCONTRADO"))[:20])
+
+    st.divider()
+    st.write("Prueba directa de validar_login:")
+    if st.button("Probar validar_login('roberto', 'Roberto13')"):
+        from utils.supabase_client import get_supabase_client
+        sb = get_supabase_client()
+        try:
+            res = sb.rpc("validar_login", {"p_username": "roberto", "p_password": "Roberto13"}).execute()
+            st.write("res.data:", res.data)
+            st.write("Tipo:", type(res.data))
+        except Exception as e:
+            st.write("EXCEPCIÓN:", repr(e))
 # --- FIN DIAGNÓSTICO ---
+
 
 
 
