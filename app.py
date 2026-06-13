@@ -5,6 +5,13 @@ from data.temario import AREAS
 
 st.set_page_config(page_title="EXANI-II Prep", page_icon="📚", layout="wide")
 
+# --- DIAGNÓSTICO TEMPORAL: borrar después de resolver el problema ---
+with st.expander("🔧 Diagnóstico (temporal)"):
+    st.write("SUPABASE_URL:", repr(st.secrets.get("SUPABASE_URL", "NO ENCONTRADO")))
+    st.write("SUPABASE_KEY (primeros 15 caracteres):", repr(st.secrets.get("SUPABASE_KEY", "NO ENCONTRADO"))[:20])
+# --- FIN DIAGNÓSTICO ---
+
+
 
 def login_screen():
     st.title("📚 EXANI-II Prep")
