@@ -96,22 +96,68 @@ def generar_preguntas(materia: str, subtema: str, n: int = 10, dificultad: int =
 
     area_aplicable = ["1", "2", "3", "4"] if area == "TODAS" else [area]
 
+    # Mapeo flexible de posibles nombres de keys que Gemini podría usar
+    ALIAS = {
+        "pregunta": ["pregunta", "question", "texto", "enunciado"],
+        "opcion_a": ["opcion_a", "opcion_A", "a", "A", "option_a"],
+        "opcion_b": ["opcion_b", "opcion_B", "b", "B", "option_b"],
+        "opcion_c": ["opcion_c", "opcion_C", "c", "C", "option_c"],
+        "opcion_d": ["opcion_d", "opcion_D", "d", "D", "option_d"],
+        "respuesta_correcta": ["respuesta_correcta", "respuesta", "correct_answer", "answer"],
+        "explicacion": ["explicacion", "explanation", "explicación"],
+    }
+
+    def get_campo(p: dict, campo: str, default=None):
+        for key in ALIAS[campo]:
+            if key in p and p[key] not in (None, ""):
+                return p[key]
+        return default
+
     preguntas = []
+    descartadas = 0
     for p in data.get("preguntas", []):
+        if not isinstance(p, dict):
+            descartadas += 1
+            continue
+
+        texto_pregunta = get_campo(p, "pregunta")
+        opc_a = get_campo(p, "opcion_a")
+        opc_b = get_campo(p, "opcion_b")
+        opc_c = get_campo(p, "opcion_c")
+        opc_d = get_campo(p, "opcion_d")
+        resp_correcta = get_campo(p, "respuesta_correcta")
+
+        # Si falta cualquier campo esencial, descartar esta pregunta
+        if not all([texto_pregunta, opc_a, opc_b, opc_c, opc_d, resp_correcta]):
+            descartadas += 1
+            continue
+
+        resp_correcta = str(resp_correcta).strip().upper()
+        if resp_correcta not in ("A", "B", "C", "D"):
+            descartadas += 1
+            continue
+
         preguntas.append({
             "materia": materia,
             "subtema": subtema,
             "area_aplicable": area_aplicable,
-            "pregunta": p["pregunta"],
-            "opcion_a": p["opcion_a"],
-            "opcion_b": p["opcion_b"],
-            "opcion_c": p["opcion_c"],
-            "opcion_d": p["opcion_d"],
-            "respuesta_correcta": p["respuesta_correcta"].upper().strip(),
-            "explicacion": p.get("explicacion", ""),
+            "pregunta": texto_pregunta,
+            "opcion_a": opc_a,
+            "opcion_b": opc_b,
+            "opcion_c": opc_c,
+            "opcion_d": opc_d,
+            "respuesta_correcta": resp_correcta,
+            "explicacion": get_campo(p, "explicacion", ""),
             "dificultad": dificultad,
             "fuente": "gemini",
         })
+
+    if not preguntas:
+        raise ValueError(
+            f"Gemini no devolvió preguntas válidas para '{materia} / {subtema}'. "
+            f"Respuesta cruda:\n{texto[:1500]}"
+        )
+
     return preguntas
 
 
@@ -139,4 +185,3 @@ def generar_retroalimentacion(errores: list):
     prompt = PROMPT_RETROALIMENTACION.format(lista_errores=lista_errores)
     response = model.generate_content(prompt)
     return response.text
-
