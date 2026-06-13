@@ -14,6 +14,7 @@ from utils.gemini_client import generar_preguntas, generar_retroalimentacion
 from utils.helpers import seleccionar_aleatorias, calcular_aciertos
 
 st.set_page_config(page_title="Práctica - EXANI-II Prep", page_icon="📝", layout="wide")
+st.sidebar.image("assets/logo.jpg", width=100)
 
 if "usuario_id" not in st.session_state:
     st.warning("Inicia sesión desde la página principal.")
@@ -191,4 +192,3 @@ elif st.session_state["bloque_terminado"]:
         if st.button("Finalizar y elegir otro tema"):
             reiniciar_estado()
             st.rerun()
-
