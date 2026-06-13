@@ -47,15 +47,16 @@ def crear_usuario(nombre: str, username: str, password: str, area: str):
 # ---------------------------------------------------------
 def obtener_preguntas(materia: str, subtema: str, area: str, limite: int = 10):
     sb = get_supabase_client()
-    res = (
+    query = (
         sb.table("preguntas")
         .select("*")
         .eq("materia", materia)
         .eq("subtema", subtema)
-        .contains("area_aplicable", [area])
-        .limit(limite * 3)  # traemos más para poder randomizar localmente
-        .execute()
     )
+    if area != "TODAS":
+        query = query.contains("area_aplicable", [area])
+
+    res = query.limit(limite * 3).execute()  # traemos más para poder randomizar localmente
     return res.data or []
 
 
